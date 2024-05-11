@@ -1,8 +1,8 @@
 # Sirius Triangles
 
-GIF
-
-![image](https://github.com/Viktr0/SiriusTriangleDrawer/assets/47856193/3dc87312-fdb6-4a29-bc4e-65a88c04f575)
+<p align="center">
+  <img src="https://github.com/Viktr0/SiriusTriangleDrawer/assets/47856193/f02f4326-aa94-4e6c-86ca-b1453eb03c7c" alt="animated" width="200%" />
+</p>
 
 ## Task description
 
