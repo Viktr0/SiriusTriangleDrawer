@@ -48,20 +48,20 @@ Constraints from which **$c$** and **$r$** can be calculated:
 
 ## Installation guide
 
-dlls next to .exe
+The program is tested in Visual Studio 2019 on Windows.
 
-freeglut folder with GL and lib inside of it
+To be able to run the code you need to download [freeglut](https://sourceforge.net/projects/freeglut/) and [glew](https://sourceforge.net/projects/glew/).
+Put both of the *include/GL* files under one *include/GL* folder and put both of the *lib* files under one *lib* folder.
+Then set the necessary links in the Project Properties:
+* Under *Configuration Properties* in *VC++ Directories* set the *Include Directories* and the *Library Directories* path.
+* Under *C/C++* in *General* set the *Additional Include Directories* path to your include directory with the GL subdirectory inside of it.
+* Under *Linker* in *General* set the *Additional Library Directories* path to your lib directory.
+* Under *Linker* in *Input* add **glew32.lib** to *Additional Dependecies*.
 
-_CRT_SECURE_NO_WARNINGS
+In the Project Properties under *C/C++* in *Preprocessor* add **_CRT_SECURE_NO_WARNINGS** to *Preprocessor  Definitions*.
 
-Project properties: Linker, C/C++, VC++ Directories
+And last, put the **freeglut.dll** and **glew32.dll** next to your **.exe** file.
 
 ## Solution
 
-Osztályok
-
-Felépítés
-
-Fileok
-
-Működés (több szín)
+Classes, architecture, files // TODO
