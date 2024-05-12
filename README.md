@@ -25,7 +25,7 @@ Constraints from which **$c$** and **$r$** can be calculated:
 * Pythagoras: **$r^2+1=c^2$**
 * The center of the circle is on the perpendicular bisector **$p_1$**, **$p_2$**: **$(c-(p_1+p_2)/2)\cdot(p1-p2)=0$**
 * The inverse image of a circle intersecting the base circle at right angles to the base circle is itself (proof?)
-* Inverse of **pi**: **$pi^*=pi/(pi \cdot pi)$**
+* Inverse of **$pi$**: **$pi^*=pi/(pi \cdot pi)$**
 
 <p align="center">
   <img src="https://github.com/Viktr0/SiriusTriangleDrawer/assets/47856193/c37a3abe-d51a-4f3a-a833-41f552dcca49" width="50%" />
