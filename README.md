@@ -12,20 +12,20 @@ It is your job to adapt a program for the simple case of fitting a triangle to t
 Fortunately, they provided a dictionary that corresponds the Sirius geometric concepts to the Euclidean geometric concepts we use:
 * The Sirius plane is a circle of unit radius of the Euclidean plane, which is called the base circle.
 * The Euclidean plane can be quantified with complex numbers, and the Sirius plane with complex numbers with an absolute value smaller than unity.
-* While the metric of the Euclidean plane is **|dz| = sqrt(dx^2 + dy^2)**, the Sirius plane is **|dz| / (1 - |z|^2)**.
+* While the metric of the Euclidean plane is **$|dz|=\sqrt{dx^2+dy^2}$**, the Sirius plane is **$|dz| / (1 - |z|^2)$**.
 * The Sirius line is a Euclidean circular arc that comes perpendicular to the base circle.
 
 After three mouse clicks, the task is to fill the triangle defined by the three points with a different color from the background, draw the edges with a different color, and write the angles and the lengths of the sides of the triangle to the standard output.
 
 ### Section
 
-Constraints from which **c** and **r** can be calculated:
-* **p1** on the circle: **|p1 - c| = r**
-* **p2** on the circle: **|p2 - c| = r**
-* Pythagoras: **r^2 + 1 = c^2**
-* The center of the circle is on the perpendicular bisector **p1**, **p2**: **(c - (p1 + p2) / 2) * ( p1 - p2) = 0**
+Constraints from which **$c$** and **$r$** can be calculated:
+* **p1** on the circle: **$|p_1-c|=r$**
+* **p2** on the circle: **$|p_2-c|=r$**
+* Pythagoras: **$r^2+1=c^2$**
+* The center of the circle is on the perpendicular bisector **$p_1$**, **$p_2$**: **$(c-(p_1+p_2)/2)\cdot(p1-p2)=0$**
 * The inverse image of a circle intersecting the base circle at right angles to the base circle is itself (proof?)
-* Inverse of **pi**: **pi' = pi / (pi * pi)**
+* Inverse of **pi**: **$pi^*=pi/(pi \cdot pi)$**
 
 <p align="center">
   <img src="https://github.com/Viktr0/SiriusTriangleDrawer/assets/47856193/c37a3abe-d51a-4f3a-a833-41f552dcca49" width="50%" />
@@ -38,14 +38,13 @@ Constraints from which **c** and **r** can be calculated:
 
 * = an Euclidean domain bounded by circular arcs
 * ~ concave polygon 
-* = háromszög lista (pl. fülvágás): GL_TRIANGLES
-* + él rajzolás: GL_LINE_LOOP
+* = triangle list: *GL_TRIANGLES* + edge drawing: *GL_LINE_LOO*P
 
 ### Angle and distance
 
-* Szög: a körívek találkozási pontjához a középpontokból húzott egyenesek szöge: Vigyázat a belső szögek kellenek!
-* Hossz: a vektorizált körívek kis szakaszaira a végpontok ds Szíriusz-távolságait kell számítani, és azt összegezni. 
-* Az (x,y) és (x+dx, y+dy) Szíriusz-távolsága: ds = sqrt(dx*dx+dy*dy)/(1–x*x–y*y)
+* Angle: the angle of the lines drawn from the centers to the intersection of the circular arcs. (Attention, the internal angles are required!)
+* Length: for the small sections of the vectorized circular arcs, the **$ds$** Sirius distances of the endpoints must be calculated and summed.
+* The distance of the **$(x,y)$** point and the **$(x+d_x,y+d_y)$** point is **$ds=\frac{\sqrt{{d_x}^2+{d_y}^2}}{(1-x^2-y^2)}$**
 
 ## Installation guide
 
