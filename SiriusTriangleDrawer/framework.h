@@ -5,6 +5,9 @@
 // Do not change it if you want to submit a homework.
 // In the homework, file operations other than printf are prohibited.
 //=============================================================================================
+#ifndef _FRAMEWORK_ 
+#define _FRAMEWORK_ 
+
 #define _USE_MATH_DEFINES		// M_PI
 #include <stdio.h>
 #include <stdlib.h>
@@ -25,6 +28,7 @@
 
 // Resolution of screen
 const unsigned int windowWidth = 600, windowHeight = 600;
+const int steps = 120;
 
 //--------------------------
 struct vec2 {
@@ -65,6 +69,13 @@ struct vec3 {
 	vec3 operator*(const vec3& v) const { return vec3(x * v.x, y * v.y, z * v.z); }
 	vec3 operator-()  const { return vec3(-x, -y, -z); }
 };
+
+inline vec3 randomRGB() {
+	float r = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float g = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	float b = static_cast <float> (rand()) / static_cast <float> (RAND_MAX);
+	return vec3(r, g, b);
+}
 
 inline float dot(const vec3& v1, const vec3& v2) { return (v1.x * v2.x + v1.y * v2.y + v1.z * v2.z); }
 
@@ -384,3 +395,5 @@ public:
 
 	~GPUProgram() { if (shaderProgramId > 0) glDeleteProgram(shaderProgramId); }
 };
+
+#endif

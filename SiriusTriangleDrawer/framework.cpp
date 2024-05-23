@@ -3,6 +3,7 @@
 // Framework for assignments. Valid from 2019.
 // Do not change it if you want to submit a homework.
 //=============================================================================================
+
 #include "framework.h"
 
 // Initialization
