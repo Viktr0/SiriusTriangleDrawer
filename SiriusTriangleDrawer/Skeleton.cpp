@@ -18,8 +18,8 @@
 //
 // NYILATKOZAT
 // ---------------------------------------------------------------------------------------------
-// Nev    : 
-// Neptun : 
+// Nev    : Horváth Viktor
+// Neptun : GSKRCV
 // ---------------------------------------------------------------------------------------------
 // ezennel kijelentem, hogy a feladatot magam keszitettem, es ha barmilyen segitseget igenybe vettem vagy
 // mas szellemi termeket felhasznaltam, akkor a forrast es az atvett reszt kommentekben egyertelmuen jeloltem.
@@ -32,6 +32,10 @@
 // negativ elojellel szamoljak el es ezzel parhuzamosan eljaras is indul velem szemben.
 //=============================================================================================
 #include "framework.h"
+#include "Circle.h"
+#include "Triangle.h"
+#include "Shape.h"
+
 
 // vertex shader in GLSL: It is a Raw string (C++11) since it contains new line characters
 const char* const vertexSource = R"(
@@ -55,34 +59,24 @@ const char* const fragmentSource = R"(
 	out vec4 outColor;		// computed color of the current pixel
 
 	void main() {
-		outColor = vec4(0, 1, 0, 1);	// computed color is the color of the primitive
+		outColor = vec4(color, 1);	// computed color is the color of the primitive
 	}
 )";
 
 GPUProgram gpuProgram; // vertex and fragment shaders
 unsigned int vao;	   // virtual world on the GPU
+int mouseClick = 0;
+std::vector<Circle*> baseCircle;
+std::vector<Circle*> mousePoints;
+std::vector<Triangle*> triangles;
+std::vector<Shape*> shapes;
+float floats[6];
 
 // Initialization, create an OpenGL context
 void onInitialization() {
 	glViewport(0, 0, windowWidth, windowHeight);
 
-	glGenVertexArrays(1, &vao);	// get 1 vao id
-	glBindVertexArray(vao);		// make it active
-
-	unsigned int vbo;		// vertex buffer object
-	glGenBuffers(1, &vbo);	// Generate 1 buffer
-	glBindBuffer(GL_ARRAY_BUFFER, vbo);
-	// Geometry with 24 bytes (6 floats or 3 x 2 coordinates)
-	float vertices[] = { -0.8f, -0.8f, -0.6f, 1.0f, 0.8f, -0.2f };
-	glBufferData(GL_ARRAY_BUFFER, 	// Copy to GPU target
-		sizeof(vertices),  // # bytes
-		vertices,	      	// address
-		GL_STATIC_DRAW);	// we do not change later
-
-	glEnableVertexAttribArray(0);  // AttribArray 0
-	glVertexAttribPointer(0,       // vbo -> AttribArray 0
-		2, GL_FLOAT, GL_FALSE, // two floats/attrib, not fixed-point
-		0, NULL); 		     // stride, offset: tightly packed
+	baseCircle = { new Circle(0.0f, 0.0f, 1.0f, vec3(0.4f, 0.4f, 0.4f)) };
 
 	// create program for the GPU
 	gpuProgram.create(vertexSource, fragmentSource, "outColor");
@@ -95,7 +89,6 @@ void onDisplay() {
 
 	// Set color to (0, 1, 0) = green
 	int location = glGetUniformLocation(gpuProgram.getId(), "color");
-	glUniform3f(location, 0.0f, 1.0f, 0.0f); // 3 floats
 
 	float MVPtransf[4][4] = { 1, 0, 0, 0,    // MVP matrix, 
 							  0, 1, 0, 0,    // row-major!
@@ -105,8 +98,16 @@ void onDisplay() {
 	location = glGetUniformLocation(gpuProgram.getId(), "MVP");	// Get the GPU location of uniform variable MVP
 	glUniformMatrix4fv(location, 1, GL_TRUE, &MVPtransf[0][0]);	// Load a 4x4 row-major float matrix to the specified location
 
-	glBindVertexArray(vao);  // Draw call
-	glDrawArrays(GL_TRIANGLES, 0 /*startIdx*/, 3 /*# Elements*/);
+	baseCircle.at(0)->draw(&gpuProgram);
+	int mP = 0;
+	for (int i = 0; i < triangles.size(); i++) {
+		for (int j = 0; j < 3; j++)
+			mousePoints.at(mP++)->draw(&gpuProgram);
+		shapes.at(i)->draw(&gpuProgram);
+		triangles.at(i)->draw(&gpuProgram);
+	}
+	for (int i = mP; i < mousePoints.size(); i++)
+		mousePoints.at(mP++)->draw(&gpuProgram);
 
 	glutSwapBuffers(); // exchange buffers for double buffering
 }
@@ -125,26 +126,53 @@ void onMouseMotion(int pX, int pY) {	// pX, pY are the pixel coordinates of the 
 	// Convert to normalized device space
 	float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
 	float cY = 1.0f - 2.0f * pY / windowHeight;
-	printf("Mouse moved to (%3.2f, %3.2f)\n", cX, cY);
+	//printf("Mouse moved to (%3.2f, %3.2f)\n", cX, cY);
 }
 
-// Mouse click event
 void onMouse(int button, int state, int pX, int pY) { // pX, pY are the pixel coordinates of the cursor in the coordinate system of the operation system
 	// Convert to normalized device space
 	float cX = 2.0f * pX / windowWidth - 1;	// flip y axis
 	float cY = 1.0f - 2.0f * pY / windowHeight;
 
-	//char* buttonStat;
-	std::string buttonStat;
+	const char* buttonStat;
 	switch (state) {
 	case GLUT_DOWN: buttonStat = "pressed"; break;
 	case GLUT_UP:   buttonStat = "released"; break;
 	}
 
 	switch (button) {
-	case GLUT_LEFT_BUTTON:   printf("Left button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);   break;
-	case GLUT_MIDDLE_BUTTON: printf("Middle button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY); break;
-	case GLUT_RIGHT_BUTTON:  printf("Right button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);  break;
+	case GLUT_LEFT_BUTTON:
+		//printf("Left button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);
+		if (mouseClick < 3) {
+			if (sqrt(cX * cX + cY * cY < 1.0f)) {
+				if (state == GLUT_DOWN) {
+					if (mouseClick == 0) {
+						floats[0] = cX;	floats[1] = cY;
+					}
+					if (mouseClick == 1) {
+						if (floats[0] != cX && floats[1] != cY) {
+							floats[2] = cX;	floats[3] = cY;
+						}
+					}
+					if (mouseClick == 2) {
+						if (floats[2] != cX && floats[3] != cY) {
+							floats[4] = cX; floats[5] = cY;
+						}
+					}
+					mousePoints.push_back(new Circle(cX, cY, 0.01f, vec3(1.0f, 0.0f, 0.0f)));
+					mouseClick++;
+					if (mouseClick == 3) {
+						triangles.push_back(new Triangle(floats[0], floats[1], floats[2], floats[3], floats[4], floats[5]));
+						shapes.push_back(new Shape(triangles.at(triangles.size() - 1)->getPoints()));
+						mouseClick = 0;
+					}
+					glutPostRedisplay();
+				}
+			}
+		}
+		break;
+	case GLUT_MIDDLE_BUTTON: /*printf("Middle button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);*/ break;
+	case GLUT_RIGHT_BUTTON:  /*printf("Right button %s at (%3.2f, %3.2f)\n", buttonStat, cX, cY);*/  break;
 	}
 }
 
